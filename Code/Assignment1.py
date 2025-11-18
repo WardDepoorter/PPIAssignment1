@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy 
 import pandas as pd 
-#Euler integration for 1D constant density model of the moon 
-#General euler integration function
-from Euler_intergrators import euler_upward, euler_downward
-# density function, can be as funtion of r TODO: replace with realistic density profile
+#Euler integration for 1D interior model of the moon 
+from Euler_intergrators import euler_upward, euler_downward 
+
+
+
+# density function,
 def rho_(r):
     if rho == 'ct':
         return 3340.0  # kg/m^3, example value
@@ -46,7 +48,7 @@ if rho == 'ct':
 
 
 
-# ================== TRY2: density layers ============
+# ================== TRY2: density layers =======================
 
 if rho =='layers':
     None

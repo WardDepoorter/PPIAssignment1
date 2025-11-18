@@ -1,0 +1,39 @@
+Moon Models:
+from Chat:
+Prompt: 'can you provide me with an overview of the existing 1D models of the moon's interior, and give references?' 
+https://chatgpt.com/share/691cc56a-5240-800f-a468-417d829f1d5d
+
+from excel:
+
+
+
+Planet	Radius (km)	    Mass (10^20 kg)	    Density	    Rotational period (day)	    Semi-major axis (km)	
+Moon	1737.53	        734.90	            3304.00	    S	                        384400.00
+
+J2	Crust thicknes	Mantle thickness	Ice thickness	Core radius	        I/MR2	    Temperature Core (K)	
+/	/               /                   /               350.00	            0.393       /
+surface Temperature (K)	    tectonic state	    Meteoritic samples
+/	                        stagnant lid	    /
+
+
+Relevant References:
+
+https://www.sciencedirect.com/science/article/abs/pii/S0031920111001373?
+='Very preliminary reference Moon model'
+y
+https://pubmed.ncbi.nlm.nih.gov/21212323/
+= 'Seismic detection of the lunar core '
+y
+https://link.springer.com/article/10.1007/s11214-019-0613-y
+='Lunar seismology: An update on interior structure models'
+y
+https://ntrs.nasa.gov/citations/19770051974?
+='Seismic structure of the moon - A summary of current status'
+no link
+https://link.springer.com/article/10.1007/s11214-020-00709-3
+='Lunar Seismology: A Data and Instrumentation Review'
+y
+https://doi.org/10.1029/2021JE006980
+='The Global Conductivity Structure of the Lunar Upper and Midmantle'
+y
+
