@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import astropy 
+import astropy.constants as const
 import pandas as pd 
 
 
@@ -30,20 +30,24 @@ def dM_dr(r):
 # dp = -rho(r) g(r) dr  
 #upward euler method; y_n+1 = y_n + (df/dr)(t_n, y_n) 
 
-
+G = const.G.to('m3 / (kg s2)').value
 R_moon = 1737.4 * 1e3  # meters TODO: check value from literature
 dr = 1 #m 
 rho = 'ct'
 
 #================ TRY1: ct density = 3340 kg/m3 ==================
 if rho == 'ct':
-    # integrate constant density model
+    # integrate constant density model to find mass profile
     r_array, M_r_array = euler_upward(0, dr, R_moon, dM_dr)
+    #Calculate gravity profile from mass profile:
+    
+    g_r_array = -G * M_r_array / r_array**2
+    g_r_array[0] = 0  # avoid division by zero at center
     #add respective columns in df:
     results_df = add_to_df(r_array, 'Radius (m)', results_df)
     results_df = add_to_df(M_r_array, 'Mass (kg)', results_df)
+    results_df = add_to_df(g_r_array, 'Gravity (m/s^2)', results_df)
     
-
     #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density is:', M_r_array[-1], 'kg')
 
@@ -53,7 +57,7 @@ if rho == 'ct':
 
     #find numerical error:
     error = abs(M_analytical - M_r_array[-1])
-    print('The error is:', error, 'kg')
+    print('The error is:', error, 'kg') 
 
 
 
