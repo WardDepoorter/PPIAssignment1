@@ -2,9 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy 
 import pandas as pd 
+
+
 #Euler integration for 1D interior model of the moon 
 from Euler_intergrators import euler_upward, euler_downward 
-
+from save_and_plot import plot_csv_columns, add_to_df
+#create empty dataframe to store results
+results_df = pd.DataFrame()
 
 
 # density function,
@@ -29,13 +33,18 @@ def dM_dr(r):
 
 R_moon = 1737.4 * 1e3  # meters TODO: check value from literature
 dr = 1 #m 
-rho = 'layers'
+rho = 'ct'
 
 #================ TRY1: ct density = 3340 kg/m3 ==================
 if rho == 'ct':
-      # constant density model
+    # integrate constant density model
     r_array, M_r_array = euler_upward(0, dr, R_moon, dM_dr)
-    print(M_r_array[-1])  # Total mass of the moon
+    #add respective columns in df:
+    results_df = add_to_df(r_array, 'Radius (m)', results_df)
+    results_df = add_to_df(M_r_array, 'Mass (kg)', results_df)
+    
+
+    #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density is:', M_r_array[-1], 'kg')
 
     #compare with analytical solution: 
@@ -53,14 +62,10 @@ if rho == 'ct':
 if rho =='layers':
     None
 
+results_df.to_csv('code/integration_output.csv')
 
 
 
 
 
-
-#print(r_array)  # Radius array
-# # put data in dataframe 
-# data = pd.DataFrame({'Radius_m': r_array, 'Mass_kg': M_r_array})
-# data.to_csv('moon_mass_profile.csv')
 

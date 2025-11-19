@@ -20,7 +20,14 @@ Relevant References:
 
 https://www.sciencedirect.com/science/article/abs/pii/S0031920111001373?
 ='Very preliminary reference Moon model'
-y
+
+
+constructed based on seismology from apollo experiments, as well as geodesy parameters such as moon mass and MMI. 
+1D model 
+widely used and discussed in literature.
+
+last pages of file contains VPREMOON model: https://github.com/rorycockshaw/VPREMOON
+
 https://pubmed.ncbi.nlm.nih.gov/21212323/
 = 'Seismic detection of the lunar core '
 y
