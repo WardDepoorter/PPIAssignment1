@@ -16,8 +16,12 @@ def rho_(r):
     if rho == 'ct':
         return 3345.56  # kg/m^3, from garcia 2019 +- 0.4 kg /m^3
     if rho == 'layers':
-        #add desired density profile here
-        return None
+        if r< 350e3:
+            return None
+        if 350e3 <= r < 1000e3:
+            return None
+        if 1000e3 <= r <= 1737.4e3:
+            return None
 
 #mass gradient function
 def dM_dr(r):
@@ -72,7 +76,7 @@ if rho == 'ct':
 
 
 
-# ================== TRY2: density layers =======================
+# ================== M1: ct density layers =======================
 
 if rho =='layers':
     None
