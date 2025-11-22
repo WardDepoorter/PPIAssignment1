@@ -14,13 +14,18 @@ results_df = pd.DataFrame()
 # density function,
 def rho_(r):
     if rho == 'ct':
-        return 3340.0  # kg/m^3, example value
+        return 3345.56  # kg/m^3, from garcia 2019 +- 0.4 kg /m^3
     if rho == 'layers':
         #add desired density profile here
         return None
 
+#mass gradient function
 def dM_dr(r):
     return 4.0 * np.pi * r**2 * rho_(r)
+
+# pressure gradient function
+def dp_dr(r):
+    return rho_(r) * g_r_array[np.searchsorted(r_array, r)]  #calculate dpdr at radius r, by taking the values of rho and g at given r.
 
 
 
@@ -33,9 +38,11 @@ def dM_dr(r):
 G = const.G.to('m3 / (kg s2)').value
 R_moon = 1737.4 * 1e3  # meters TODO: check value from literature
 dr = 1 #m 
-rho = 'ct'
 
-#================ TRY1: ct density = 3340 kg/m3 ==================
+
+rho = 'ct' # choose density model: 'ct' for constant density, 'layers' for ct layered approach M1 and M2 for variable density
+
+#================ M1: ct density = 3345.56 kg/m3 ==================
 if rho == 'ct':
     # integrate constant density model to find mass profile
     r_array, M_r_array = euler_upward(0, dr, R_moon, dM_dr)
@@ -43,11 +50,15 @@ if rho == 'ct':
     
     g_r_array = -G * M_r_array / r_array**2
     g_r_array[0] = 0  # avoid division by zero at center
+    print (len(g_r_array))
+    
+    r_array, p_r_array = euler_downward(0, dr, R_moon, dp_dr)
+    print (len(p_r_array))
     #add respective columns in df:
     results_df = add_to_df(r_array, 'Radius (m)', results_df)
     results_df = add_to_df(M_r_array, 'Mass (kg)', results_df)
     results_df = add_to_df(g_r_array, 'Gravity (m/s^2)', results_df)
-    
+    results_df = add_to_df(p_r_array, 'Pressure (Pa)', results_df)  
     #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density is:', M_r_array[-1], 'kg')
 

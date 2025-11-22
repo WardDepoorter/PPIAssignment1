@@ -1,7 +1,10 @@
+# from https://github.com/rorycockshaw/VPREMOON
+
+
 import numpy as np 
 import matplotlib.pyplot as plt
 
-strdata = open("Documents\moondata.txt").read()
+strdata = open("Code/VPREMOON.txt").read()
 strdata = strdata.replace("\n", "")
 strdata = strdata.replace("\t", ",")
 
@@ -23,6 +26,7 @@ radii = np.array([])
 vp = np.array([])
 vs = np.array([])
 rho = np.array([])
+
 for j in strradii: 
     radii = np.append(radii,float(j))
 for j in strvp: 
@@ -37,11 +41,11 @@ k = 0
 while k < len(radii) - 1: 
     xvalues = [radii[k],radii[k+1]]
     yvalues = [rho[k],rho[k+1]]
-    plt.plot(xvalues,yvalues)
+    plt.plot(yvalues,xvalues)
     k+=1
 
 plt.title("Lunar density against radius")
-plt.xlabel("Radius/km")
-plt.ylabel("Density/g $cm^-3$")
+plt.ylabel("Radius/km")
+plt.xlabel("Density/g $cm^-3$")
     
 plt.show() 
