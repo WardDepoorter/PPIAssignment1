@@ -49,5 +49,3 @@ plt.ylabel("Radius/km")
 plt.xlabel("Density/g $cm^-3$")
     
 plt.show() 
-
-plt.clf()
