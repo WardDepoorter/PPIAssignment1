@@ -23,7 +23,7 @@ print(rho_array)
 print(r_array)
 for i in range(1, len(r_array)):
    
-    dmdr = 4.0 * np.pi * r_array[i]**2 * rho_array[i]
+    dmdr = 4.0 * np.pi * r_array[i-1]**2 * rho_array[i-1]
     #print(dmdr)
     m = m_array[-1] + dmdr * (r_array[i] - r_array[i-1])
     m_array = np.append(m_array, m)
@@ -33,4 +33,6 @@ V = 4/3 * np.pi *((1709*1e3)**3 - (380*1e3)**3)
 rho_avg = m_array[-1] / V
 print("Average density between 380 km and 1710 km:", rho_avg, "kg/m^3")
 
-        
+#simple sum average:
+rho_simple_avg = np.mean(rho_array)
+print("Simple average density between 380 km and 1710 km:", rho_simple_avg, "kg/m^3")

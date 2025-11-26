@@ -12,16 +12,19 @@ results_df = pd.DataFrame()
 
 
 # density function,
+# options: constant density: 'ct' or layered density: 'ct_layers_vpremoon' or  ADD other model, 'full_vpremoon',  
 def rho_(r):
     if rho == 'ct':
         return 3345.56  # kg/m^3, from garcia 2019 +- 0.4 kg /m^3
-    if rho == 'layers':
-        if r< 350e3:
-            return None
-        if 350e3 <= r < 1000e3:
-            return None
-        if 1000e3 <= r <= 1737.4e3:
-            return None
+    if rho == 'ct_layers_vpremoon':
+        if r < 380e3:
+            return 5171
+        if 380e3 <= r < 1709e3:
+            return 3308
+        if 1709e3 <= r < 1736e3:
+            return 2762
+        if r >= 1736e3:
+            return 2600
 
 #mass gradient function
 def dM_dr(r):
@@ -41,12 +44,12 @@ def dp_dr(r):
 
 G = const.G.to('m3 / (kg s2)').value
 R_moon = 1737.4 * 1e3  # meters TODO: check value from literature
-dr = 1 #m 
+dr = 1000 #m 
 
 
-rho = 'ct' # choose density model: 'ct' for constant density, 'layers' for ct layered approach M1 and M2 for variable density
+rho = 'ct_layers_vpremoon' # choose density model: 'ct' for constant density, 'layers' for ct layered approach M1 and M2 for variable density
 
-#================ M1: ct density = 3345.56 kg/m3 ==================
+#=========================================== M1: ct average density = 3345.56 kg/m3 ==========================================
 if rho == 'ct':
     # integrate constant density model to find mass profile
     r_array, M_r_array = euler_upward(0, dr, R_moon, dM_dr)
@@ -62,13 +65,14 @@ if rho == 'ct':
     results_df = add_to_df(r_array, 'Radius (m)', results_df)
     results_df = add_to_df(M_r_array, 'Mass (kg)', results_df)
     results_df = add_to_df(g_r_array, 'Gravity (m/s^2)', results_df)
-    results_df = add_to_df(p_r_array, 'Pressure (Pa)', results_df)  
+    results_df = add_to_df(p_r_array/(1e9), 'Pressure (GPa)', results_df) 
+    results_df = add_to_df(np.array([rho_(r) for r in r_array]), 'Density (kg/m^3)', results_df)
     #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density is:', M_r_array[-1], 'kg')
 
     #compare with analytical solution: 
-    M_analytical = (4/3) * np.pi * R_moon**3 * rho_(0)
-    print('The analytical solution,assuming constant density, is:', M_analytical, "kg")  # Analytical mass of the moon
+    M_analytical = (4/3) * np.pi * R_moon**3 * 3345.56
+    print('The analytical solution,assuming constant density layers , is:', M_analytical, "kg")  # Analytical mass of the moon
 
     #find numerical error:
     error = abs(M_analytical - M_r_array[-1])
@@ -76,11 +80,41 @@ if rho == 'ct':
 
 
 
-# ================== M1: ct density layers =======================
+#=========================================== M1: ct density layers ==========================================
 
-if rho =='layers':
-    None
+if rho =='ct_layers_vpremoon':
+    # integrate constant density model to find mass profile
+    r_array, M_r_array = euler_upward(0, dr, R_moon, dM_dr)
+    #Calculate gravity profile from mass profile:
+    
+    g_r_array = -G * M_r_array / r_array**2
+    g_r_array[0] = 0  # avoid division by zero at center
+    print (len(g_r_array))
+    
+    r_array, p_r_array = euler_downward(0, dr, R_moon, dp_dr)
+    print (len(p_r_array))
+    #add respective columns in df:
+    results_df = add_to_df(r_array, 'Radius (m)', results_df)
+    results_df = add_to_df(M_r_array, 'Mass (kg)', results_df)
+    results_df = add_to_df(g_r_array, 'Gravity (m/s^2)', results_df)
+    results_df = add_to_df(p_r_array/(1e9), 'Pressure (GPa)', results_df)
+    results_df = add_to_df(np.array([rho_(r) for r in r_array]), 'Density (kg/m^3)', results_df)
 
+    #print(M_r_array[-1])  # Total mass of the moon
+    print('The numerically computed solution, assuming constant density layers, is:', M_r_array[-1], 'kg')
+
+    #compare with analytical solution: 
+    #TODO: compute analytical solution for layered density
+    #find numerical error:
+    #error = abs(M_analytical - M_r_array[-1])
+    #print('The error is:', error, 'kg') 
+
+
+
+
+
+
+#store results in csv
 results_df.to_csv('code/integration_output.csv')
 
 
