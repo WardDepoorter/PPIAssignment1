@@ -115,7 +115,7 @@ if rho =='ct_layers_vpremoon':
 
 
 #store results in csv
-results_df.to_csv('code/integration_output.csv')
+results_df.to_csv('Code/integration_output.csv')
 
 
 

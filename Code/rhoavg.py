@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from Euler_intergrators import euler_upward, euler_downward
 
-df = pd.read_csv('VPREMOON.csv')
-r = df['r'].to_numpy()
-rho = df['rho'].to_numpy()
+df = pd.read_csv('vpremoon.csv')
+r = df['Radius'].to_numpy()
+rho = df['Density'].to_numpy()
 
 r_array = np.array([])  
 rho_array = np.array([])
