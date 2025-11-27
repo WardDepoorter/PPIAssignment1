@@ -4,105 +4,69 @@ import argparse
 import matplotlib.pyplot as plt
 
 #!/usr/bin/env python3
-"""
-PlotFromCsv.py
 
-Small utility to plot two columns from a CSV file.
-
-Usage example:
-    plot_csv_columns("data.csv", x_col=0, y_col=1, delimiter=",", save_path="out.png")
-"""
-
-
-
-def plot_csv_columns(
-    csv_path: str,
-    x_col: Union[int, str] = 0,
-    y_col: Union[int, str] = 1,
-    delimiter: str = ",",
-    header: Optional[int] = "infer",
-    xlabel: Optional[str] = None,
-    ylabel: Optional[str] = None,
-    title: Optional[str] = None,
-    figsize: Tuple[int, int] = (8, 5),
-    save_path: Optional[str] = None,
-    show: bool = True,
-):
+def plot(model1_csv, model2_csv, model3_csv):
     """
-    Read csv_path and plot two columns.
-
-    Parameters:
-    - csv_path: path to CSV file.
-    - x_col, y_col: column index (int) or column name (str). Default 0 and 1.
-    - delimiter: field delimiter (default ',').
-    - header: row number to use as column names, None if no header, or 'infer' (default).
-    - xlabel, ylabel, title: optional labels.
-    - figsize: figure size.
-    - save_path: if provided, save figure to this path.
-    - show: if True, call plt.show().
-
-    Returns:
-    - (fig, ax) matplotlib figure and axes.
+    model1 = your model (red solid)
+    model2 = green dotted
+    model3 = blue dotted
     """
-    df = pd.read_csv(csv_path, sep=delimiter, header=header)
 
-    def _col(series_or_index):
-        if isinstance(series_or_index, int):
-            return df.iloc[:, series_or_index]
-        return df[series_or_index]
+    import pandas as pd
+    import matplotlib.pyplot as plt
 
-    x = _col(x_col)
-    y = _col(y_col)
+    label1 = "New Model"
+    label2 = "VPREMOON Model"
+    label3 = "W11 Model"
 
-    # infer axis labels if not provided
-    xlabel = xlabel or (x.name if hasattr(x, "name") and x.name is not None else str(x_col))
-    ylabel = ylabel or (y.name if hasattr(y, "name") and y.name is not None else str(y_col))
+    # Load data
+    m_own = pd.read_csv(model1_csv)
+    m_vpre = pd.read_csv(model2_csv)
+    m_w11 = pd.read_csv(model3_csv)
 
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(x, y, marker="o", linestyle="-")
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    if title:
-        ax.set_title(title)
-    ax.grid(True)
-    fig.tight_layout()
+    # Extract columns
+    r1, M1, g1, P1 = m_own["Radius"]/1000, m_own["Mass"], m_own["Gravity"], m_own["Pressure"]
+    r2, M2, g2, P2 = m_vpre["Radius"]/1000, m_vpre["Mass"], m_vpre["Gravity"], m_vpre["Pressure"]
+    r3, M3, g3, P3 = m_w11["Radius"]/1000, m_w11["Mass"], m_w11["Gravity"], m_w11["Pressure"]
 
-    if save_path:
-        fig.savefig(save_path, dpi=300)
+    # Create subplots
+    fig, axes = plt.subplots(1, 3, figsize=(15, 6), sharey=True)
 
-    if show:
-        plt.show()
+    # --- Mass ---
+    axes[0].plot(M1, r1, 'r-', label=label1)
+    axes[0].plot(M2, r2, 'g:', label=label2)
+    axes[0].plot(M3, r3, 'b:', label=label3)
+    axes[0].set_xlabel("Mass (kg)")
+    axes[0].set_title("Mass Integration")
+    axes[0].grid(True)
 
-    return fig, ax
+    # --- Gravity ---
+    axes[1].plot(g1, r1, 'r-')
+    axes[1].plot(g2, r2, 'g:')
+    axes[1].plot(g3, r3, 'b:')
+    axes[1].set_xlabel("Gravity (m/s²)")
+    axes[1].set_title("Gravity Profile")
+    axes[1].grid(True)
 
+    # --- Pressure ---
+    axes[2].plot(P1, r1, 'r-')
+    axes[2].plot(P2, r2, 'g:')
+    axes[2].plot(P3, r3, 'b:')
+    axes[2].set_xlabel("Pressure (GPa)")
+    axes[2].set_title("Pressure Integration")
+    axes[2].grid(True)
 
-if __name__ == "__main__":
-    # simple CLI for quick testing
+    # Y-axis (shared)
+    axes[0].set_ylabel("Radius (km)")
 
-    parser = argparse.ArgumentParser(description="Plot two columns from a CSV file.")
-    parser.add_argument("csv", help="CSV file path")
-    parser.add_argument("--x", default=0, help="x column (index or name). Default 0")
-    parser.add_argument("--y", default=1, help="y column (index or name). Default 1")
-    parser.add_argument("--sep", default=",", help="CSV delimiter")
-    parser.add_argument("--no-show", action="store_true", help="Do not call plt.show()")
-    parser.add_argument("--save", help="Save figure to file")
-    args = parser.parse_args()
+    # Reverse y-axis so centre is at bottom and surface at top
+    
 
-    # try to convert x/y to int when possible
-    def _maybe_int(s):
-        try:
-            return int(s)
-        except Exception:
-            return s
+     # Shared legend (top of figure)
+    axes[0].legend( labels=[label1, label2, label3], loc='upper left')
 
-    plot_csv_columns(
-        args.csv,
-        x_col=_maybe_int(args.x),
-        y_col=_maybe_int(args.y),
-        delimiter=args.sep,
-        show=not args.no_show,
-        save_path=args.save,
-    )
+    plt.tight_layout()
+    plt.show()
 
 def add_to_df(array, column_name, df):
     """
@@ -123,4 +87,5 @@ def add_to_df(array, column_name, df):
     return df
 
     
-    
+if __name__ == "__main__":
+    plot('Code/integration_output.csv', 'Code/vpre_moon.csv', 'Code/w11_moon.csv')
