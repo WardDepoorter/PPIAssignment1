@@ -41,21 +41,21 @@ print("Simple average density between 380 km and 1710 km:", rho_simple_avg, "kg/
 df = pd.read_csv('vpremoon.csv')
 r = df['Radius'].to_numpy()*1000  # convert to meters
 rho = df['Density'].to_numpy()*1000  # convert to kg/m^3
+
 dmdr_array = 4.0 * np.pi * r**2 * rho
 
 M_r_array = np.array([0])  # initial mass at center is 0
-# integrate starting from the bottom (core) by reversing arrays
-r_rev = r[::-1]
-dmdr_rev = dmdr_array[::-1]
 
-for i in range(1, len(r_rev)):
-    dmdr = dmdr_rev[i - 1]
-    dr = r_rev[i] - r_rev[i - 1]
+# integrate starting from the bottom (core) by reversing arrays
+for i in range(1, len(r)):
+    dmdr = dmdr_array[i]
+    print (dmdr)
+    dr = r[i] - r[i - 1]
     m = M_r_array[-1] + dmdr * dr
     M_r_array = np.append(M_r_array, m)
 print(M_r_array[-1])
-#add m array to dataframe and save as csv for plotting:
-df['Mass'] = M_r_array[::-1]
-df.to_csv('vpremoon.csv', index=False)
+#add to dataframe and save as csv
+M_r_array = df['Mass'] = M_r_array
+df.to_csv('vpremoon_with_mass.csv', index=False)
 
 

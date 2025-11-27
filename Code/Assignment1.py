@@ -99,7 +99,7 @@ if rho == 'ct':
     results_df = add_to_df(g_r_array, 'Gravity', results_df)
     results_df = add_to_df(p_r_array/(1e9), 'Pressure', results_df) 
     results_df = add_to_df(np.array([rho_(r) for r in r_array]), 'Density', results_df)
-    results_df.to_csv('Code/integration_output.csv')
+    results_df.to_csv('Code/output/integration_output.csv')
 
     #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density is:', M_r_array[-1], 'kg')
@@ -172,7 +172,7 @@ if rho =='ct_layers':
     results_df = add_to_df(g_r_array, 'Gravity', results_df)
     results_df = add_to_df(p_r_array/(1e9), 'Pressure', results_df)
     results_df = add_to_df(np.array([rho_(r) for r in r_array]), 'Density', results_df)
-    results_df.to_csv('Code/integration_output.csv')
+    results_df.to_csv('Code/output/integration_output.csv')
     #print(M_r_array[-1])  # Total mass of the moon
     print('The numerically computed solution, assuming constant density layers, is:', M_r_array[-1], 'kg')
 

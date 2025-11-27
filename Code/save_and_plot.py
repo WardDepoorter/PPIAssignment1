@@ -1,3 +1,4 @@
+#from turtle import save
 from typing import Union, Optional, Tuple
 import pandas as pd
 import argparse
@@ -25,9 +26,9 @@ def plot(model1_csv, model2_csv, model3_csv):
     m_w11 = pd.read_csv(model3_csv)
 
     # Extract columns
-    r1, M1, g1, P1 = m_own["Radius"]/1000, m_own["Mass"], m_own["Gravity"], m_own["Pressure"]
-    r2, M2, g2, P2 = m_vpre["Radius"]/1000, m_vpre["Mass"], m_vpre["Gravity"], m_vpre["Pressure"]
-    r3, M3, g3, P3 = m_w11["Radius"]/1000, m_w11["Mass"], m_w11["Gravity"], m_w11["Pressure"]
+    r1, M1, g1, P1 = m_own["Radius"]/1000, m_own["Mass"], -m_own["Gravity"], m_own["Pressure"]
+    r2, M2, g2, P2 = m_vpre["Radius"], m_vpre["Mass"], m_vpre["Gravity"], m_vpre["Pressure"]
+    r3, M3, g3, P3 = m_w11["Radius"]/1000, m_w11["Mass"], -m_w11["Gravity"], m_w11["Pressure"]
 
     # Create subplots
     fig, axes = plt.subplots(1, 3, figsize=(15, 6), sharey=True)
@@ -67,6 +68,7 @@ def plot(model1_csv, model2_csv, model3_csv):
 
     plt.tight_layout()
     plt.show()
+    plt.savefig('Code/output/mass_gravity_pressure_profiles.png', dpi=300)
 
 def add_to_df(array, column_name, df):
     """
@@ -88,4 +90,4 @@ def add_to_df(array, column_name, df):
 
     
 if __name__ == "__main__":
-    plot('Code/integration_output.csv', 'Code/vpre_moon.csv', 'Code/w11_moon.csv')
+    plot('Code/integration_output.csv', 'vpremoon_with_mass.csv', 'Code/w11_moon.csv')
