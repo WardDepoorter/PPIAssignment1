@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 #!/usr/bin/env python3
 
-def plot(model1_csv, model2_csv, model3_csv):
+def plot(model1_csv, model2_csv, model3_csv, model4_csv=None):
     """
     model1 = your model (red solid)
     model2 = green dotted
@@ -19,7 +19,7 @@ def plot(model1_csv, model2_csv, model3_csv):
     label1 = "New Model"
     label2 = "VPREMOON Model"
     label3 = "W11 Model"
-
+    
     # Load data
     m_own = pd.read_csv(model1_csv)
     m_vpre = pd.read_csv(model2_csv)
@@ -27,7 +27,7 @@ def plot(model1_csv, model2_csv, model3_csv):
 
     # Extract columns
     r1, M1, g1, P1 = m_own["Radius"]/1000, m_own["Mass"], -m_own["Gravity"], m_own["Pressure"]
-    r2, M2, g2, P2 = m_vpre["Radius"], m_vpre["Mass"], m_vpre["Gravity"], m_vpre["Pressure"]
+    r2, M2, g2, P2 = m_vpre["Radius"]/1000, m_vpre["Mass"], -m_vpre["Gravity"], m_vpre["Pressure"]
     r3, M3, g3, P3 = m_w11["Radius"]/1000, m_w11["Mass"], -m_w11["Gravity"], m_w11["Pressure"]
 
     # Create subplots
@@ -35,24 +35,24 @@ def plot(model1_csv, model2_csv, model3_csv):
 
     # --- Mass ---
     axes[0].plot(M1, r1, 'r-', label=label1)
-    axes[0].plot(M2, r2, 'g:', label=label2)
-    axes[0].plot(M3, r3, 'b:', label=label3)
+    axes[0].plot(M2, r2, 'g-.', label=label2)
+    axes[0].plot(M3, r3, 'b-.', label=label3)
     axes[0].set_xlabel("Mass (kg)")
     axes[0].set_title("Mass Integration")
     axes[0].grid(True)
 
     # --- Gravity ---
     axes[1].plot(g1, r1, 'r-')
-    axes[1].plot(g2, r2, 'g:')
-    axes[1].plot(g3, r3, 'b:')
+    axes[1].plot(g2, r2, 'g-.')
+    axes[1].plot(g3, r3, 'b-.')
     axes[1].set_xlabel("Gravity (m/s²)")
     axes[1].set_title("Gravity Profile")
     axes[1].grid(True)
 
     # --- Pressure ---
     axes[2].plot(P1, r1, 'r-')
-    axes[2].plot(P2, r2, 'g:')
-    axes[2].plot(P3, r3, 'b:')
+    axes[2].plot(P2, r2, 'g-.')
+    axes[2].plot(P3, r3, 'b-.')
     axes[2].set_xlabel("Pressure (GPa)")
     axes[2].set_title("Pressure Integration")
     axes[2].grid(True)
@@ -67,8 +67,8 @@ def plot(model1_csv, model2_csv, model3_csv):
     axes[0].legend( labels=[label1, label2, label3], loc='upper left')
 
     plt.tight_layout()
-    plt.show()
-    plt.savefig('Code/output/mass_gravity_pressure_profiles.png', dpi=300)
+    #plt.show()
+    plt.savefig('Code/output/mass_gravity_pressure_profiles.png')
 
 def add_to_df(array, column_name, df):
     """
@@ -90,4 +90,4 @@ def add_to_df(array, column_name, df):
 
     
 if __name__ == "__main__":
-    plot('Code/integration_output.csv', 'vpremoon_with_mass.csv', 'Code/w11_moon.csv')
+    plot('Code/output/integration_output.csv', 'Code/vpre_moon.csv', 'Code/w11_moon.csv')

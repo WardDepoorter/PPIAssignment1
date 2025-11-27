@@ -14,12 +14,12 @@ results_df = pd.DataFrame()
 
 # density function,
 # options: constant density: 'ct' or layered density: 'ct_layers_vpremoon' or  ADD other model, 'full_vpremoon',  
-def rho_(r):
+def rho_(r, i = 0):
     if rho == 'ct':
         return 3345.56  # kg/m^3, from garcia 2019 +- 0.4 kg /m^3
     if rho == 'ct_layers':
         if r < 245e3:
-            return 7000
+            return 6000+100*i
         if 245e3 <= r < 340e3:
             return 5100
         if 340e3 <= r < 480e3:
