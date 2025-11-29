@@ -48,3 +48,4 @@ def euler_downward(y0, h , x_max, dydx):
         dydx_val = dydx(x_values[i])
         y_values[i-1] = y_values[i] - dydx_val * h
     return x_values, y_values
+

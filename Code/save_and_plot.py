@@ -19,6 +19,7 @@ def plot(model1_csv, model2_csv, model3_csv, model4_csv=None):
     label1 = "New Model"
     label2 = "VPREMOON Model"
     label3 = "W11 Model"
+
     
     # Load data
     m_own = pd.read_csv(model1_csv)
@@ -29,6 +30,10 @@ def plot(model1_csv, model2_csv, model3_csv, model4_csv=None):
     r1, M1, g1, P1 = m_own["Radius"]/1000, m_own["Mass"], -m_own["Gravity"], m_own["Pressure"]
     r2, M2, g2, P2 = m_vpre["Radius"]/1000, m_vpre["Mass"], -m_vpre["Gravity"], m_vpre["Pressure"]
     r3, M3, g3, P3 = m_w11["Radius"]/1000, m_w11["Mass"], -m_w11["Gravity"], m_w11["Pressure"]
+
+    if model4_csv:
+        m_vpre_mass = pd.read_csv(model4_csv)
+        r4, M4, g4, P4 = m_vpre_mass["Radius"], m_vpre_mass["Mass"], m_vpre_mass["Gravity"], m_vpre_mass["Pressure"]
 
     # Create subplots
     fig, axes = plt.subplots(1, 3, figsize=(15, 6), sharey=True)
@@ -43,7 +48,7 @@ def plot(model1_csv, model2_csv, model3_csv, model4_csv=None):
 
     # --- Gravity ---
     axes[1].plot(g1, r1, 'r-')
-    axes[1].plot(g2, r2, 'g-.')
+    axes[1].plot(g4, r4, 'g-.')
     axes[1].plot(g3, r3, 'b-.')
     axes[1].set_xlabel("Gravity (m/s²)")
     axes[1].set_title("Gravity Profile")
@@ -51,7 +56,7 @@ def plot(model1_csv, model2_csv, model3_csv, model4_csv=None):
 
     # --- Pressure ---
     axes[2].plot(P1, r1, 'r-')
-    axes[2].plot(P2, r2, 'g-.')
+    axes[2].plot(P4, r4, 'g-.')
     axes[2].plot(P3, r3, 'b-.')
     axes[2].set_xlabel("Pressure (GPa)")
     axes[2].set_title("Pressure Integration")
@@ -90,4 +95,4 @@ def add_to_df(array, column_name, df):
 
     
 if __name__ == "__main__":
-    plot('Code/output/integration_output.csv', 'Code/vpre_moon.csv', 'Code/w11_moon.csv')
+    plot('Code/output/integration_output.csv', 'Code/vpre_moon.csv', 'Code/w11_moon.csv', model4_csv='vpremoon_with_mass.csv')

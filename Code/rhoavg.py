@@ -18,8 +18,7 @@ for i in range(len(r)):
         #print(r_array)
         #print(rho_array)
 
-r_array = r_array[::-1]
-rho_array = rho_array[::-1]
+
 print(rho_array)
 print(r_array)
 for i in range(1, len(r_array)):
