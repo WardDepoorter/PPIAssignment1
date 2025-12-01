@@ -3,43 +3,128 @@ import matplotlib.pyplot as plt
 import astropy.constants as const
 import pandas as pd 
 import scipy.optimize as optimize
+from Densitymodels import M1, W11, vpremoon, ct, test
+from M1 import MMI, Mass
+from save_and_plot import plot_array
+#params to constrain M1
+
+M_moon = 7.346e22  # kg
+I_factor_moon = 0.3932 # dimensionless
+R_moon = 1737.4e3  # m
+I_moon = I_factor_moon * M_moon * R_moon**2  # kg·m²
+print(I_moon)
+model = vpremoon
+# vpremoon = [
+#         {"r_in": 0,       "r_out": 380e3,   "rho": 8000},  #  core
+#         {"r_in": 380e3,   "r_out": 1709e3,  "rho": 3360},  # mantle
+#         {"r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762},  # crust
+#         {"r_in": 1736e3,  "r_out": 1737.4e3,  "rho": 2600},  # regolith
+#     ]
 
 
+def core_mass(M_tot, model):
+    r_core = model[1]['r_in']
+    for layer in model:
+        if layer['r_in'] >= r_core:
+            M_tot -= Mass(layer['rho'], layer['r_out'], layer['r_in'])
+    M_core = M_tot
+    return M_core
 
+def core_inertia(I_tot, model):
+    r_core = model[1]['r_in']
+    for layer in model:
+        if layer['r_in'] >= r_core:
+            
+            mmi_layer = MMI(layer['rho'], layer['r_out'], layer['r_in'])
+            print(mmi_layer)
+            I_tot -= mmi_layer
+    I_core = I_tot
 
-#  # 
-# r = np.array([245, 340, 480, 1709, 1736, 1737]) * 1e3  # m
-# r = r[::-1]  # reverse to start from center
-# rho = np.array([2600, 2746, 3360 ,3400, 5100])  # kg/m^3
-#   # reverse to match radius order
-
-# M = np.array([])  # initial mass at center is 0
-# for i in range(5):
-#     M = np.append(M, 4/3 * np.pi * ((r[i]**3 - r[i+1]**3) * rho[i]))
-# M_total = np.sum(M)
-# M_remaining = M_moon - M_total
-# rho_core = M_remaining / (4/3 * np.pi * (245e3**3))
-# print("core density:", rho_core)
-
-
-
-# def core_constraint():
-#     #calculats inner core density given outer core radius
-#     rho_core = 
-#     M = np.array([])  # initial mass at center is 0
-#     for i in range(5):
-#         M = np.append(M, 4/3 * np.pi * ((r[i]**3 - r[i+1]**3) * rho[i]))
-#     M_total = np.sum(M)
-#     M_remaining = M_moon - M_total
-#     return M_remaining
+    return I_core, 
 def r_three(r_o, r_i):
-    V = 4/3 * np.pi * (r_o**3 - r_i**3)
-    return V
+    return r_o**3 - r_i**3
+def r_five(r_o, r_i):   
+    return r_o**5 - r_i**5
 
-def r_five(r_o, r_i):
-    return ((r_o**5) - (r_i**5))   
+M_core = core_mass(M_moon, model)
+I_core,  = core_inertia(I_moon, model)
+print(f"Core Mass:              {M_core} kg")
+print(f"Core Moment of Inertia: {I_core} kg·m²")
+
+def eqns_to_solve(vars, r_core):
+    r_c_inner, rho_c_outer = vars  # outer core radius and inner core density 
+    r_crust  = 1709e3
+    
+    M = -((3*M_moon)/(4*np.pi))  + 2600 * r_three(1737.4e3,1736e3) + 2762 * r_three(1736e3,r_crust) + 3400 * r_three(r_crust,r_core) + rho_c_outer * r_three(r_core,r_c_inner) + 7000 * r_three(r_c_inner,0)
+    I = -((15*I_moon)/(8*np.pi)) + 2600 * r_five(1737.4e3,1736e3) + 2762 * r_five(1736e3,r_crust) + 3400 * r_five(r_crust,r_core) + rho_c_outer * r_five(r_core,r_c_inner) + 7000 * r_five(r_c_inner,0)
+    return [M, I]
+r_core = np.linspace(340e3, 420e3, 200)
+rho_core_outer =np.array([])  
+r_core_inner = np.array([])
+for i in r_core:
+    Guess = [190e3, 6000]  # initial guess for mantle density and core
+    solution = optimize.fsolve(eqns_to_solve, Guess, args=(i,))
+    print(f"For core radius {i} m, optimal inner core radius and outer core density:", solution)
+    r_core_inner = np.append(r_core_inner, solution[0])
+    rho_core_outer = np.append(rho_core_outer, solution[1])
 
 
+# Guess = [200e3, 6000]  # initial guess for mantle density and core
+# solution = optimize.fsolve(eqns_to_solve, Guess, args=(r_core,))
+# print(solution)
+print(r_core_inner)
+print(rho_core_outer)
+
+
+# Plot both:
+r_core_km = r_core / 1e3
+r_core_inner_km = r_core_inner / 1e3
+
+fig, ax1 = plt.subplots()
+
+# Left axis: density (make this line red)
+ln1 = ax1.plot(r_core_km, rho_core_outer, color='tab:red', label='Outer Core Density')
+ax1.set_xlabel('Outer Core Radius (km)')
+ax1.set_ylabel('Outer Core Density (kg/m^3)')
+ax1.tick_params(axis='y')
+
+# Right axis: inner core radius
+ax2 = ax1.twinx()
+ln2 = ax2.plot(r_core_km, r_core_inner_km, color='tab:blue', label='Inner Core Radius')
+ax2.set_ylabel('Inner Core Radius (km)')
+ax2.tick_params(axis='y')
+
+# Vertical dotted red line at nominal core radius 380 km
+vline = ax1.axvline(380, color='red', linestyle=':', linewidth=1.5)
+
+# Combined legend
+lines = ln1 + ln2 
+labels = [l.get_label() for l in lines]
+ax1.legend(lines, labels, loc='best')
+
+# Grid: both horizontal and vertical
+ax1.grid(True, which='both', axis='both', linestyle='--', alpha=0.4)
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 def eqns_to_solve(vars, i):
     M_moon = 7.346e22
     I_factor = 0.3932 # m, fixed inner core radius
@@ -65,4 +150,4 @@ for i in i_array:
     Guess = [300e3, 6000]  # initial guess for outer core radius and inner core density
     solution = optimize.fsolve(eqns_to_solve, Guess, args=(i,))
     print("For inner core radius:", i, "Optimal outer core radius (m) and inner core density (kg/m^3):", solution)
-    
+    '''

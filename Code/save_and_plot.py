@@ -92,6 +92,16 @@ def add_to_df(array, column_name, df):
     """
     df[column_name] = array
     return df
+def plot_array(x, y, x_label="x", y_label="y", legend_label="data"):
+    plt.figure(figsize=(6,4))
+    plt.plot(x, y, label=legend_label)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(f'Code/output/{legend_label.replace(" ","_")}.png')
 
     
 if __name__ == "__main__":

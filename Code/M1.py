@@ -5,24 +5,32 @@ import pandas as pd
 
 from Euler_intergrators import euler_upward, euler_downward 
 from save_and_plot import plot, add_to_df
-from Densitymodels import M1, W11, vpremoon, ct
+from Densitymodels import M1, W11, vpremoon, ct,test, M1_340, M1_420
 
 #================================================== constants =====================================================
 G = const.G.to('m3 / (kg s2)').value # m^3 / (kg s^2)
 R_moon = 1737.4 * 1e3  # me
-dr = 1 #m 
+M_moon = 7.346e22  # kg
+I_factor_moon = 0.3932 # dimensionless
 
 #create empty dataframe to store results
 results_df = pd.DataFrame()
-
-
 # density function,
 # options: constant density: 'ct' or layered density: 'ct_layers_vpremoon' or  ADD other model, 'full_vpremoon',  
+
 def rho_(r):
     if model == ct:
         return ct[0]['rho']
     if model == M1:
         for layer in M1:
+            if layer['r_in'] <= r < layer['r_out']:
+                return layer['rho']
+    if model == M1_340:
+        for layer in M1_340:
+            if layer['r_in'] <= r < layer['r_out']:
+                return layer['rho']
+    if model == M1_420:
+        for layer in M1_420:
             if layer['r_in'] <= r < layer['r_out']:
                 return layer['rho']
     if model == W11:
@@ -42,6 +50,52 @@ def dM_dr(r):
 def dp_dr(r):
     return rho_(r) * g_r_array[np.searchsorted(r_array, r)] 
 
+
+
+def MMI(rho, r_o, r_i):
+    """
+    Calculate the moment of inertia for a spherical shell,with ct density
+    """
+    if r_i >= r_o:
+        raise TypeError("Inner radius must be less than outer radius.")
+    
+    I_shell = (8/15) * np.pi * rho * (r_o**5 - r_i**5)
+    return I_shell
+
+
+
+def Mass(rho, r_o, r_i):
+    """
+    Calculate the mass of a spherical shell, with ct density
+    """
+    if r_i >= r_o:
+        raise TypeError("Inner radius must be less than outer radius.")
+    M_shell = (4/3) * np.pi * rho * (r_o**3 - r_i**3)
+    return M_shell
+
+
+def mass_and_inertia(model):
+    '''
+    Calculate total mass and moment of inertia for a given density model.
+    This is used to check if the model used fits the known mass and inertia of the moon.
+    Params: model: list of dictionaries containing  'r_out', 'r_in'and 'rho' 
+    returns: M_total, I_total, I_factor'''
+
+    M_total = 0.0
+    I_total = 0.0
+    I_factor = 0.0
+    for layer in model:
+        r_in  = layer["r_in"]
+        r_out = layer["r_out"]
+        rho   = layer["rho"]
+
+        # mass contribution
+        M_total += Mass(rho, r_out, r_in)
+
+        # moment of inertia contribution
+        I_total += MMI(rho, r_out, r_in)
+    I_factor = I_total / (M_total * (model[-1]["r_out"])**2)
+    return M_total, I_total, I_factor
  
 def integrate(model, h, output_df):
         
@@ -74,10 +128,49 @@ def integrate(model, h, output_df):
         return output_df
     
 
-model = ct
-results_df = integrate(model, 1, results_df)
-results_df.to_csv('Code/output/integration_output.csv', index=False)
+    
 
+
+
+#model = M1
+# # ==== uncomment to check mass and inertia of model: ====
+# M, I , I_factor = mass_and_inertia(model)
+# print(f"Total Mass:           {M} kg")
+# print(f"Total Moment of Inertia: {I} kg·m²")
+# print(f"Inertia Factor:       {I_factor}")
+#dr = 100  # m step size 
+
+
+
+#=================  generate csv for min/max vs avg =========================================
+
+# dr = 100  # m step size
+# model = M1
+# results_df = integrate(model, dr, results_df)
+# results_df.to_csv('Code/output/integration_output_380km.csv', index=False)
+
+
+# results_df = pd.DataFrame()
+# model  = M1_340
+# results_df = integrate(model, dr, results_df)
+# results_df.to_csv('Code/output/integration_output_340km.csv', index=False)
+
+
+
+# results_df = pd.DataFrame()
+# model  = M1_420
+# results_df = integrate(model, dr, results_df)
+# results_df.to_csv('Code/output/integration_output_420km.csv', index=False)
+# #=================  plotting for min/max vs avg =========================================
+
+
+
+
+
+
+
+
+#Old code:
 
 # #=========================================== M1: ct average density = 3345.56 kg/m3 ==========================================
 # if model == 'ct':
