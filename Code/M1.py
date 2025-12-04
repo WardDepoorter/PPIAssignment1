@@ -5,7 +5,7 @@ import pandas as pd
 
 from Euler_intergrators import euler_upward, euler_downward 
 from save_and_plot import plot, add_to_df
-from Densitymodels import M1, W11, vpremoon, ct,test, M1_340, M1_420
+from Interior_models import M1, W11, vpremoon, ct,test, M1_340, M1_420
 
 #================================================== constants =====================================================
 G = const.G.to('m3 / (kg s2)').value # m^3 / (kg s^2)

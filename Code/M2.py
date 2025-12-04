@@ -7,6 +7,7 @@ import pandas as pd
 #Euler integration for 1D interior model of the moon 
 from Euler_intergrators import euler_upward, euler_downward 
 from save_and_plot import plot, add_to_df
+from M1 import *
 
 #create empty dataframe to store results
 results_df = pd.DataFrame()
@@ -34,7 +35,7 @@ def kappa_calc(k, rho, c_p):
     kappa = k / (rho * c_p)
     return kappa
 
-def Rayleigh_number(alpha, g, rho, dT_dr, d, kappa, eta):
+def Rayleigh_number(alpha, g, rho, deltaT, r_in, r_out, eta, k, c_p):
     """
     Calculate the Rayleigh number for a spherical shell.
     Params:
@@ -44,18 +45,24 @@ def Rayleigh_number(alpha, g, rho, dT_dr, d, kappa, eta):
         Gravitational acceleration (m/s²)
     rho : float
         Density (kg/m³)
-    dT_dr : float
-        Temperature gradient (K/m)
-    d : float
-        Thickness of the shell (m)
-    kappa : float
-        Thermal diffusivity (m²/s)
+    deltaT : float
+        Temperature difference across the shell (K)
+    r_in : float
+        Inner radius of the shell (m)
+    r_out : float( d = r_out - r_in)
+        Outer radius of the shell (m)
     eta : float
         Dynamic viscosity (Pa·s)
-
+    k : float
+        Thermal conductivity (W/m·K)
+    c_p : float
+        Specific heat capacity (J/kg·K)
     Returns:
     float
         The Rayleigh number.
+   
     """
-    Ra = (alpha * g * rho * dT_dr * d**4) / (kappa * eta)
+    d = r_out - r_in
+    kappa = k / (rho * c_p)
+    Ra = (alpha * g * rho * deltaT * d**3) / (kappa * eta)
     return Ra

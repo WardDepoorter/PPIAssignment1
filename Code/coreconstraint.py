@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import astropy.constants as const
 import pandas as pd 
 import scipy.optimize as optimize
-from Densitymodels import M1, W11, vpremoon, ct, test
+from Interior_models import M1, W11, vpremoon, ct, test
 from M1 import MMI, Mass
 from save_and_plot import plot_array
 #params to constrain M1
@@ -58,9 +58,13 @@ def eqns_to_solve(vars, r_core):
     M = -((3*M_moon)/(4*np.pi))  + 2600 * r_three(1737.4e3,1736e3) + 2762 * r_three(1736e3,r_crust) + 3400 * r_three(r_crust,r_core) + rho_c_outer * r_three(r_core,r_c_inner) + 7000 * r_three(r_c_inner,0)
     I = -((15*I_moon)/(8*np.pi)) + 2600 * r_five(1737.4e3,1736e3) + 2762 * r_five(1736e3,r_crust) + 3400 * r_five(r_crust,r_core) + rho_c_outer * r_five(r_core,r_c_inner) + 7000 * r_five(r_c_inner,0)
     return [M, I]
+
+
 r_core = np.linspace(340e3, 420e3, 200)
 rho_core_outer =np.array([])  
 r_core_inner = np.array([])
+
+
 for i in r_core:
     Guess = [190e3, 6000]  # initial guess for mantle density and core
     solution = optimize.fsolve(eqns_to_solve, Guess, args=(i,))

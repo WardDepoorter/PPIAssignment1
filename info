@@ -26,23 +26,21 @@ constructed based on seismology from apollo experiments, as well as geodesy para
 1D model 
 widely used and discussed in literature.
 
-last pages of file contains VPREMOON model: https://github.com/rorycockshaw/VPREMOON
+last pages of file contains VPREMOON model:
 
 https://pubmed.ncbi.nlm.nih.gov/21212323/
 = 'Seismic detection of the lunar core '
-y
+
 https://link.springer.com/article/10.1007/s11214-019-0613-y
 ='Lunar seismology: An update on interior structure models'
-y
+
 https://ntrs.nasa.gov/citations/19770051974?
 ='Seismic structure of the moon - A summary of current status'
-no link
+
 https://link.springer.com/article/10.1007/s11214-020-00709-3
 ='Lunar Seismology: A Data and Instrumentation Review'
-y
+
 https://doi.org/10.1029/2021JE006980
 ='The Global Conductivity Structure of the Lunar Upper and Midmantle'
-y
+y\
 
-998,998.0,13909004136341.695,-0.0009320531474490602,4.722810007203776,3345.56
-998,998.0,13909004136341.695,-0.0009320531474490602,4722810007.203776,
