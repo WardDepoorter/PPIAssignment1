@@ -144,23 +144,23 @@ def integrate(model, h, output_df):
 
 #=================  generate csv for min/max vs avg =========================================
 
-# dr = 100  # m step size
-# model = M1
-# results_df = integrate(model, dr, results_df)
-# results_df.to_csv('Code/output/integration_output_380km.csv', index=False)
+dr = 100  # m step size
+model = M1
+results_df = integrate(model, dr, results_df)
+results_df.to_csv('Code/output/integration_output_380km.csv', index=False)
 
 
-# results_df = pd.DataFrame()
-# model  = M1_340
-# results_df = integrate(model, dr, results_df)
-# results_df.to_csv('Code/output/integration_output_340km.csv', index=False)
+results_df = pd.DataFrame()
+model  = M1_340
+results_df = integrate(model, dr, results_df)
+results_df.to_csv('Code/output/integration_output_340km.csv', index=False)
 
 
 
-# results_df = pd.DataFrame()
-# model  = M1_420
-# results_df = integrate(model, dr, results_df)
-# results_df.to_csv('Code/output/integration_output_420km.csv', index=False)
+results_df = pd.DataFrame()
+model  = M1_420
+results_df = integrate(model, dr, results_df)
+results_df.to_csv('Code/output/integration_output_420km.csv', index=False)
 # #=================  plotting for min/max vs avg =========================================
 
 

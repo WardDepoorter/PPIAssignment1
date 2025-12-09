@@ -126,7 +126,10 @@ plt.show()
 
 
 
-
+# Guess = [190e3, 6000]  # initial guess for outer core radius and inner core density
+# k =380e3  
+# solution = optimize.fsolve(eqns_to_solve, Guess, args=(k,))
+# print(solution)
 
 '''
 def eqns_to_solve(vars, i):

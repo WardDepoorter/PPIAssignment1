@@ -12,9 +12,9 @@ df_mean['Radius_km'] = df_mean['Radius'] / 1000.0
 df_max['Radius_km']  = df_max['Radius']  / 1000.0
 
 # Extract radius and profiles
-r_min,  M_min,  g_min,  P_min  = df_min['Radius_km'],  df_min['Mass'],  df_min['Gravity'],  df_min['Pressure']
-r_mean, M_mean, g_mean, P_mean = df_mean['Radius_km'], df_mean['Mass'], df_mean['Gravity'], df_mean['Pressure']
-r_max,  M_max,  g_max,  P_max  = df_max['Radius_km'],  df_max['Mass'],  df_max['Gravity'], df_max['Pressure']
+r_min,  M_min,  g_min,  P_min  = df_min['Radius_km'],  df_min['Mass'],  -df_min['Gravity'],  df_min['Pressure']
+r_mean, M_mean, g_mean, P_mean = df_mean['Radius_km'], df_mean['Mass'], -df_mean['Gravity'], df_mean['Pressure']
+r_max,  M_max,  g_max,  P_max  = df_max['Radius_km'],  df_max['Mass'],  -df_max['Gravity'], df_max['Pressure']
 
 # ---- Create plots ----
 fig, axs = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
@@ -43,4 +43,4 @@ axs[2].set_xlabel("Pressure (GPa)")
 axs[2].grid(True)
 
 plt.tight_layout()
-plt.show()
+plt.savefig("Code/output/MinMax_Mass_Gravity_Pressure_Profiles.png", dpi=400)
