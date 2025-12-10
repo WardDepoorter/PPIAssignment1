@@ -43,4 +43,5 @@ axs[2].set_xlabel("Pressure (GPa)")
 axs[2].grid(True)
 
 plt.tight_layout()
-plt.savefig("Code/output/MinMax_Mass_Gravity_Pressure_Profiles.png", dpi=400)
+# plt.savefig("Code/output/MinMax_Mass_Gravity_Pressure_Profiles.png", dpi=400)
+plt.show()
