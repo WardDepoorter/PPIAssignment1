@@ -52,6 +52,7 @@ for i in range(1, len(r)):
     dr = r[i] - r[i - 1]
     m = M_r_array[-1] + dmdr * dr
     M_r_array = np.append(M_r_array, m)
+    
 print(M_r_array[-1])
 #add to dataframe and save as csv
 M_r_array = df['Mass'] = M_r_array
