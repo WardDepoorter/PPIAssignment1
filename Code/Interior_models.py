@@ -1,3 +1,4 @@
+import pandas as pd
 #          inner radius     outer radius     density        inner T   Outer Temp alpha          Specific heat Viscosity         k 
 #          r_in : m         r_out : m        rho : kg/m^3   T_in : K  T_out : K  alpha : 1/K    Cp : J/kg·K   eta : Pa·s      k : W/m·K
 M2_min = [
@@ -73,3 +74,31 @@ W11 = [
         {"r_in": 1736.1e3,"r_out": 1737.1e3, "rho": 2600},  # regolith
         ]
 ct = [{"r_in": 0, "r_out": 1737.4e3, "rho": 3345.56}]  
+
+def get_from_dict(parameter, layer_name,model):
+    for layer in model:
+        if layer['layer'] == layer_name:
+            return layer[parameter]
+    raise ValueError(f"Layer '{layer_name}' not found in the model.")
+def get_from_profile(column, profile, R):
+    """
+    Get a parameter value at a specific radius R from a profile.
+    
+    Args:
+        profile: dataframe containing the profile data in columns
+        column: the column name of the parameter to retrieve
+        R: Radius in meters
+    
+    Returns:
+        The parameter value at radius R
+
+    """
+    
+    value = profile.loc[profile['Radius'] == R, column].values[0]#extracts the value
+    return value    
+    
+#print(get('rho', 'mantle', M2_avg)  )# returns 3400
+#print(get('alpha', 'inner core', M2_avg))
+# csv = 'Code/output/thermal_profile_M2_380km.csv'
+# df = pd.read_csv(csv)
+# print(get_from_profile('Density', df, 1709000))  # Example usage
