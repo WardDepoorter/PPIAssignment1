@@ -6,8 +6,10 @@ import pandas as pd
 #Euler integration for 1D interior model of the moon 
 from Euler_intergrators import euler_upward, euler_downward 
 from save_and_plot import add_to_df
-#from M1 import *
+
 from Interior_models import M2_min, M2_avg, M2_max, get_from_dict, get_from_profile
+
+G = const.G.to('m3 / (kg s2)').value
 def Rayleigh_number(layer):
     """
     Calculate the Rayleigh number for a spherical shell.
@@ -144,8 +146,10 @@ df = pd.read_csv(csv)
 df = thermal(M2_min, M1_csv=csv, df=df)
 df = thermal(M2_avg, M1_csv=csv, df=df)
 df = thermal(M2_max, M1_csv=csv, df=df)
-
+print("Thermal profile integration complete. saved to 'Code/output/thermal_profile_M2_380km.csv'")
 df.to_csv('Code/output/thermal_profile_M2_380km.csv', index=False)
+
+
 plot_thermal_profile  = False
 #plot results for min, avg, max models:
 if plot_thermal_profile:
@@ -177,57 +181,177 @@ if plot_thermal_profile:
     plt.legend()
     plt.grid(True)
     plt.show()
-
-
+#clear df to save memory
+del df
+# ===============================================================================================
+# M2 interior model density calculation: linearized equation of state
+# ===============================================================================================
+ 
 # iterate M2 mass, P and G profiles for min, avg, max models
 #based on linear local density profile rho(dT, dp) 
 #start from M1 w thermal profile csv, 380 km core radius
 
+#final M1+ thermal profile
 csv = 'Code/output/thermal_profile_M2_380km.csv'
 df_M1 = pd.read_csv(csv)
 
+# reference T and P as average of layer boundaries: 
 def get_ref_T(model, layer_name):
     T_in = get_from_dict('T_in', layer_name , model) 
     T_out = get_from_dict('T_out', layer_name , model)
-    return (T_in + T_out) / 2
+    return (T_in + T_out) / 2 # reference T at 3/4 layer depth
 
 def get_ref_P(model,layer_name, df = df_M1):
     r_in = get_from_dict('r_in', layer_name , model)
     r_out = get_from_dict('r_out', layer_name , model)
     
     P_in = get_from_profile('Pressure', df, r_in)
+    #print( P_in)
     P_out = get_from_profile('Pressure', df, r_out)
     
     return (P_in + P_out) / 2
+#print(get_ref_P(M2_avg, 'inner core'))
 
-# def density(R, model, df):
-#     """
-#     Calculate density at radius R based on linearized equation of state.
-#     Params:
-#     R : float
-#         Radius at which to calculate density (m).
-#     model : list of dicts
-#         Interior model defining layers and their properties.
-#     df : pandas DataFrame
-#         DataFrame containing temperature and pressure profiles.
-#     Returns:
-#     float
-#         Density at radius R (kg/m³).
-#     """
-#     #find which layer R is in
-#     for layer in model:
-#         r_in = layer['r_in']
-#         r_out = layer['r_out']
-#         layer_name = layer['layer']
-#         if r_in <= R <= r_out:
-#             #take Tref and Pref at layer(independent of iteration):
-#             Tref = get_ref_T(model, layer_name)
-#             Pref = get_ref_P(model, layer_name)
-#             rho0 = layer['rho']
-#             #get local T and P from df:
-#             T = 
-            
-            
-            
-#             return rho
-#     raise ValueError(f"Radius {R} not found in any layer of the model.")
+def density(R, model, df, T_profile = 'T_M2_avg'):
+    """
+    Calculate density at radius R based on linearized equation of state.
+    Params:
+    R : float
+        Radius at which to calculate density (m).
+    model : list of dicts
+        Interior model defining layers and their properties.
+    df : pandas DataFrame
+        DataFrame containing temperature and pressure profiles.
+    Returns:
+    float
+        Density at radius R (kg/m³).
+    """
+    #find which layer R is in
+    for layer in model:
+        r_in = layer['r_in']
+        r_out = layer['r_out']
+        layer_name = layer['layer']
+        if r_in <= R <= r_out:
+            #take Tref and Pref at layer(independent of iteration):
+            Tref = get_ref_T(model, layer_name)
+            Pref = get_ref_P(model, layer_name)
+            rho0 = layer['rho'] # reference density
+            alpha = layer['alpha']# thermal expansivity
+            K_b = layer['K_b']#  bulk modulus
+            #get local T and P from df:
+            T = get_from_profile(T_profile, df, R)
+            P = get_from_profile('Pressure', df, R)
+            #linearized equation of state:
+            rho = rho0 * (1 - alpha * (T - Tref) + (1 / K_b) * (P - Pref))
+            return rho
+    raise ValueError(f"Radius {R} m is out of bounds of the model.")
+
+#mass gradient function
+def dM_dr(r):
+    rho = get_from_profile('rho_new', df, r)
+    return 4.0 * np.pi * r**2 * rho
+
+# pressure gradient function
+def dp_dr(r):
+    rho = get_from_profile('rho_new', df, r)
+    g = get_from_profile('Gravity', df, r)
+    return g * rho
+# def integrate(df):
+#         '''
+#         This function integrates the mass and pressure profiles of the moon given a df with rho(r).
+#         Params:
+#         model: list of dictionaries, 1 for each density layer, containing  'r_out', 'r_in', 'rho'
+#         h = float , step size for euler integration
+#         df:  add results to new columns in this dataframe
+#         '''
+        
+#         r_max = df['Radius'].iloc[-1]
+#         r_array = np.arange(0, r_max, h)
+
+#         r_array, M_r_array = euler_upward(0, h, r_max, dM_dr)
+#         r_array, p_r_array = euler_downward(0, h, r_max, dp_dr)
+#         g_array = -G * M_r_array / r_array**2
+        
+#         df = add_to_df(M_r_array, 'Mass', df)
+#         df = add_to_df(p_r_array, 'Pressure', df)
+#         df = add_to_df(g_array, 'Gravity', df)          
+#         return df
+def integrate(df):
+    """
+    Integrate mass and pressure profiles given rho(r) on the same radial grid as df.
+    """
+    r = df['Radius'].to_numpy()
+    n = len(r)
+
+    _, M_r_array = euler_upward(0, h, r[-1], dM_dr)
+    _, p_r_array = euler_downward(0, h, r[-1], dp_dr)
+
+    # pad/trim to match df length
+    if len(M_r_array) < n:
+        M_r_array = np.pad(M_r_array, (0, n - len(M_r_array)), mode='edge')
+        p_r_array = np.pad(p_r_array, (0, n - len(p_r_array)), mode='edge')
+    else:
+        M_r_array = M_r_array[:n]
+        p_r_array = p_r_array[:n]
+    p_r_array = p_r_array/(1e9) # convert to GPa
+    # gravity, avoid r=0
+    g_array = np.zeros(n)
+    g_array[1:] = -G * M_r_array[1:] / r[1:]**2
+
+    df = add_to_df(M_r_array, 'Mass', df)
+    df = add_to_df(p_r_array, 'Pressure', df)
+    df = add_to_df(g_array, 'Gravity', df)
+    return df
+
+# iterate density profile M2:
+# first implement lin dens once to the M1 profile with thermal structure; 
+def lin_dens(df, model):
+    for i in range(len(df)):
+        R = df.loc[i, 'Radius']
+        rho = density(R, model, df=df, T_profile='T_M2_max')
+        df.loc[i, 'rho_new'] = rho
+    return df
+
+## Run lin_dens once and save output:
+
+#df_M1 = lin_dens(df_M1, M2_avg)
+#df_M1.to_csv('Code/output/M2_avg_380km_it0_test.csv', index=False)
+
+## Plot initial density profile for M2_avg:
+# plt.figure(figsize=(8, 6))
+# plt.plot(df['rho_new'], df['Radius'] / 1e3, label='M2_avg density profile', color='purple', linewidth=2)
+# plt.xlabel('Density (kg/m³)')
+# plt.ylabel('Radius (km)')
+# plt.title('Density Profile for M2_avg Model (Iteration 0)')
+# plt.legend()
+# plt.grid(True)
+# plt.show()
+
+
+
+df= pd.read_csv('Code/output/M2_avg_380km_it0.csv')
+iteration = 0
+dm = 1e20 #initial mass difference
+m0 = df['Mass'].iloc[-1]
+print(f"Initial mass: {m0:.2e} kg")
+h = 100 #integration step size in m
+
+while dm > 1e5: #1e5 kg mass convergence
+    iteration += 1
+    df = lin_dens(df, M2_max)
+    
+    m0 = df['Mass'].iloc[-1] #final mass from previous iteration
+    print(f"Starting iteration {iteration}...")
+    df = integrate(df)
+    mi = df['Mass'].iloc[-1]# final mass after integration
+    print(f" Iteration {iteration}: Integrated mass = {mi:.2e} kg")
+    dm = abs(mi - m0)
+    print(f" Mass difference = {dm:.2e} kg")
+    if iteration >= 20:
+        print("Maximum iterations reached. Stopping.")
+        
+        break
+df.to_csv('Code/output/M2_max_380km_final.csv', index=False)
+print("Final M2_max model saved to 'Code/output/M2_max_380km_final.csv'")    
+# 1 pressure is not in GPa
+# iteration 2 does not seem to work since gives exact same results as iteration 1.

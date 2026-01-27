@@ -1,26 +1,26 @@
 import pandas as pd
-#          inner radius     outer radius     density        inner T   Outer Temp alpha          Specific heat Viscosity         k 
-#          r_in : m         r_out : m        rho : kg/m^3   T_in : K  T_out : K  alpha : 1/K    Cp : J/kg·K   eta : Pa·s      k : W/m·K
+#          inner radius     outer radius     density        inner T   Outer Temp expansivity    Specific heat Viscosity         k       Bulk modulus
+#          r_in : m         r_out : m        rho : kg/m^3   T_in : K  T_out : K  alpha : 1/K    Cp : J/kg·K   eta : Pa·s      k : W/m·K K_b : GPa
 M2_min = [
-        {"layer": "inner core", "r_in": 0,       "r_out": 128.088e3,  "rho": 7000, 'T_in': 1700, 'T_out': 1600, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80},    #  inner core:rigid!
-        {"layer": "outer core", "r_in": 128.088e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1600, 'T_out': 1350, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45},  #  outer core
-        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1350, 'T_out': 600, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06},  # mantle
-        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 600, 'T_out': 300, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06},  # crust
-        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 300, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7},  # regolith
+        {"layer": "inner core", "r_in": 0,       "r_out": 128e3,  "rho": 7000, 'T_in': 1700, 'T_out': 1600, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80, 'K_b': 160},    #  inner core:rigid!
+        {"layer": "outer core", "r_in": 128e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1600, 'T_out': 1350, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45, 'K_b': 140},  #  outer core
+        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1350, 'T_out': 600, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06, 'K_b': 120},  # mantle
+        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 600, 'T_out': 300, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06, 'K_b': 80},  # crust
+        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 300, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7, 'K_b': 20},  # regolith
     ]
 M2_avg = [
-        {"layer": "inner core", "r_in": 0,       "r_out": 128.088e3,  "rho": 7000, 'T_in': 1850, 'T_out': 1750, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80},    #  inner core:rigid!
-        {"layer": "outer core", "r_in": 128.088e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1750, 'T_out': 1500, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45},  #  outer core
-        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1500, 'T_out': 650, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06},  # mantle
-        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 650, 'T_out': 310, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06},  # crust
-        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 310, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7},  # regolith
+        {"layer": "inner core", "r_in": 0,       "r_out": 128e3,  "rho": 7000, 'T_in': 1850, 'T_out': 1750, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80, 'K_b': 160},    #  inner core:rigid!
+        {"layer": "outer core", "r_in": 128e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1750, 'T_out': 1500, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45, 'K_b': 140},  #  outer core
+        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1500, 'T_out': 650, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06, 'K_b': 120},  # mantle
+        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 650, 'T_out': 310, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06, 'K_b': 80},  # crust
+        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 310, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7, 'K_b': 20},  # regolith
     ]
 M2_max = [
-        {"layer": "inner core", "r_in": 0,       "r_out": 128.088e3,  "rho": 7000, 'T_in': 2000, 'T_out': 1900, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80},    #  inner core:rigid!
-        {"layer": "outer core", "r_in": 128.088e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1900, 'T_out': 1650, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45},  #  outer core
-        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1650, 'T_out': 700, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06},  # mantle
-        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 700, 'T_out': 320, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06},  # crust
-        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 320, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7},  # regolith
+        {"layer": "inner core", "r_in": 0,       "r_out": 128e3,  "rho": 7000, 'T_in': 2000, 'T_out': 1900, 'alpha':  8e-5, 'Cp': 700 , 'eta': 10**30, 'k': 80, 'K_b': 160},    #  inner core:rigid!
+        {"layer": "outer core", "r_in": 128e3,   "r_out": 380e3,  "rho": 5980.78, 'T_in': 1900, 'T_out': 1650, 'alpha': 9e-5, 'Cp': 698, 'eta': 2*10**16, 'k': 45, 'K_b': 140},  #  outer core
+        {"layer": "mantle", "r_in": 380e3,   "r_out": 1709e3,  "rho": 3400, 'T_in': 1650, 'T_out': 700, 'alpha': 2.75e-5, 'Cp': 1200, 'eta': 10**21, 'k': 3.06, 'K_b': 120},  # mantle
+        {"layer": "crust", "r_in": 1709e3,  "r_out": 1736e3,  "rho": 2762, 'T_in': 700, 'T_out': 320, 'alpha': 2.75e-5, 'Cp': 1100, 'eta': 10**24, 'k': 3.06, 'K_b': 80},  # crust
+        {"layer": "regolith", "r_in": 1736e3,  "r_out": 1737.3e3,  "rho": 2600, 'T_in': 320, 'T_out': 273.15, 'alpha': 2.75e-5, 'Cp': 800, 'eta': 10**24, 'k': 0.7, 'K_b': 20},  # regolith
     ]
 M1 = [
         {"layer": "inner core", "r_in": 0,       "r_out": 128.088e3,  "rho": 7000},    #  inner core:rigid!
@@ -94,7 +94,7 @@ def get_from_profile(column, profile, R):
 
     """
     
-    value = profile.loc[profile['Radius'] == R, column].values[0]#extracts the value
+    value = profile.loc[profile['Radius'] == R, column].values[0] #extracts the value
     return value    
     
 #print(get('rho', 'mantle', M2_avg)  )# returns 3400

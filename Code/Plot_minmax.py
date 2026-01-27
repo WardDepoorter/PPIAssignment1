@@ -2,9 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # ---- Load CSV files ----
-df_min  = pd.read_csv("code/output/integration_output_340km.csv")
-df_mean = pd.read_csv("code/output/integration_output_380km.csv")
-df_max  = pd.read_csv("code/output/integration_output_420km.csv")
+# df_min  = pd.read_csv("code/output/integration_output_340km.csv")
+# df_mean = pd.read_csv("code/output/integration_output_380km.csv")
+# df_max  = pd.read_csv("code/output/integration_output_420km.csv")
+df_min  = pd.read_csv("code/output/M2_min_380km_final.csv")
+df_mean = pd.read_csv("code/output/M2_avg_380km_final.csv")
+df_max  = pd.read_csv("code/output/M2_max_380km_final.csv")
 
 # Convert radius to km
 df_min['Radius_km']  = df_min['Radius']  / 1000.0
@@ -20,9 +23,9 @@ r_max,  M_max,  g_max,  P_max  = df_max['Radius_km'],  df_max['Mass'],  -df_max[
 fig, axs = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
 
 # Mass profile
-axs[0].plot(M_mean, r_mean, label="380 km", linewidth=2)
-axs[0].plot(M_min,  r_min,  linestyle=":", label="340 km")
-axs[0].plot(M_max,  r_max,  linestyle=":", label="420 km")
+axs[0].plot(M_mean, r_mean, label="T_avg", linewidth=2)
+axs[0].plot(M_min,  r_min,  linestyle=":", label="T_min")
+axs[0].plot(M_max,  r_max,  linestyle=":", label="T_max")
 axs[0].set_xlabel("Mass (kg)")
 axs[0].set_ylabel("Radius (km)")
 axs[0].grid(True)
